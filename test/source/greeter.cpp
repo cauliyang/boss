@@ -1,12 +1,10 @@
-#include <boss/fq_io.h>
+#include <boss/fq_utils.h>
 #include <boss/version.h>
 #include <doctest/doctest.h>
 
 #include <string>
 
 TEST_CASE("Greeter") {
-  using namespace greeter;
-
   Greeter greeter("Tests");
 
   CHECK(greeter.greet(LanguageCode::EN) == "Hello, Tests!");
