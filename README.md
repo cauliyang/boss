@@ -9,7 +9,7 @@
   <img src="https://repository-images.githubusercontent.com/254842585/4dfa7580-7ffb-11ea-99d0-46b8fe2f4170" height="175" width="auto" />
 </p>
 
-# ModernCppStarter
+# BioinfOrmaticS toolboxeS aka BOSS
 
 Setting up a new C++ project usually requires a significant amount of preparation and boilerplate code, even more so for modern C++ projects with tests, executables and continuous integration.
 This template is the result of learnings from many previous projects and should help reduce the work required to setup up a modern C++ project.
@@ -37,7 +37,7 @@ This template is the result of learnings from many previous projects and should 
   - Capitalization matters here: `Greeter` means the name of the project, while `greeter` is used in file names.
   - Remember to rename the `include/greeter` directory to use your project's lowercase name and update all relevant `#include`s accordingly.
 - Replace the source files with your own
-- For header-only libraries: see the comments in [CMakeLists.txt](CMakeLists.txt)
+- For header-only libraries: see the comments in [CMakeLists.txt](include/CMakeLists.txt)
 - Add [your project's codecov token](https://docs.codecov.io/docs/quick-start) to your project's github secrets under `CODECOV_TOKEN`
 - Happy coding!
 
@@ -145,7 +145,7 @@ Ccache can be enabled by configuring with `-DUSE_CCACHE=<ON | OFF>`.
 
 > Can I use this for header-only libraries?
 
-Yes, however you will need to change the library type to an `INTERFACE` library as documented in the [CMakeLists.txt](CMakeLists.txt).
+Yes, however you will need to change the library type to an `INTERFACE` library as documented in the [CMakeLists.txt](include/CMakeLists.txt).
 See [here](https://github.com/TheLartians/StaticTypeInfo) for an example header-only library based on the template.
 
 > I don't need a standalone target / documentation. How can I get rid of it?

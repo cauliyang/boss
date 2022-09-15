@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GREETER_H
+#define GREETER_H
 
 #include <string>
 
@@ -29,3 +30,5 @@ namespace greeter {
   };
 
 }  // namespace greeter
+
+#endif  // GREETER_H
