@@ -4,8 +4,10 @@
 #include <boost/iostreams/categories.hpp>  // input_filter_tag
 #include <boost/iostreams/operations.hpp>  // get, put, WOULD_BLOCK
 #include <cstdio>                          // EOF.
+#include <filesystem>
 
 namespace boss {
+  namespace fs = std::filesystem;
 
   enum class FqDirection { Forward, Reverse };
 
@@ -59,6 +61,10 @@ namespace boss {
     uint64_t line_count_{0};
     int saved_line_count_{0};
   };
+
+  //--------------Definitions of helper functions for splitting ncbi fq files----//
+
+  [[nodiscard]] bool is_gzip(std::string_view path);
 
 }  // namespace boss
 

@@ -1,11 +1,9 @@
-#include <boss/fq_utils.h>
 #include <boss/version.h>
 #include <spdlog/spdlog.h>
 
-#include <binary/parser/vcf.hpp>
 #include <binary/utils.hpp>
+#include <boss/fq_utils.hpp>
 #include <cxxopts.hpp>
-#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -34,7 +32,7 @@ auto main(int argc, char** argv) -> int {
   }
 
   if (result["version"].as<bool>()) {
-    spdlog::info("Greeter, version {}", BOSS_VERSION);
+    spdlog::info("version {}", BOSS_VERSION);
     return 0;
   }
 

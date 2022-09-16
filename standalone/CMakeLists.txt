@@ -42,7 +42,7 @@ function(add_standalone targetName)
             ${CMAKE_CURRENT_LIST_DIR}/${targetName}/include
     )
     target_compile_options(${targetName} PRIVATE -Wall -Wextra -Wnon-virtual-dtor -pedantic -Werror)
-    set_target_properties(${targetName} PROPERTIES CXX_EXTENSIONS OFF)
+    set_target_properties(${targetName} PROPERTIES CXX_EXTENSIONS OFF OUTPUT_NAME boss-${targetName})
 endfunction()
 
 #file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)

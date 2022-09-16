@@ -1,0 +1,115 @@
+name: Linux CI
+
+on:
+  push:
+    branches:
+      - main
+      - release*
+  pull_request:
+    branches:
+      - main
+      - release*
+
+env:
+  CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules
+  CMAKE_VERSION: 3.18.0
+  CTEST_OUTPUT_ON_FAILURE: 1
+
+defaults:
+  run:
+    shell: bash -ex {0}
+
+jobs:
+  build:
+    name: ${{matrix.name}}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    strategy:
+      matrix:
+        include:
+          - name: "standalone gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build: standalone
+            build_type: Release
+          - name: "standalone gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build: standalone
+            build_type: Release
+          - name: "Unit Test gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build: test
+            build_type: Debug
+          - name: "Unit Test gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build: test
+            build_type: Release
+          - name: "Unit Test gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: test
+            build_type: Debug
+          - name: "standalone gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: standalone
+            build_type: Release
+
+    #          - name: "Unit Test clang13"
+    #            cxx: "clang++-14"
+    #            cc: "clang-14"
+    #            build: test
+    #            build_type: Release
+    #          - name: "standalone clang13"
+    #            cxx: "clang++-14"
+    #            cc: "clang-14"
+    #            build: standalone
+    #            build_type: Release
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Configure APT
+        continue-on-error: true
+        run: bash ./.github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        run: bash ./.github/workflows/scripts/install_cmake.sh
+
+      - name: Install compiler ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }} autoconf
+
+      - uses: actions/cache@v2
+        with:
+          path: "**/cpm_modules"
+          key: ${{ github.workflow }}-cpm-modules-${{ hashFiles('**/CMakeLists.txt', '**/*.cmake') }}
+
+
+      - name: Tool versions
+        run: |
+          env cmake --version
+          env ${{ matrix.cxx }} --version
+          env ${{ matrix.cc }} --version
+      - name: configure standalone
+        if: matrix.build == 'standalone'
+        run: cmake -S${{matrix.build}} -Bbuild/${{matrix.build}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_C_COMPILER=${{matrix.cc}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}
+
+      - name: configure test
+        if: matrix.build == 'test'
+        run: cmake -S${{matrix.build}} -Bbuild/${{matrix.build}} -DCMAKE_BUILD_TYPE=${{matrix.build_type}} -DCMAKE_C_COMPILER=${{matrix.cc}} -DCMAKE_CXX_COMPILER=${{matrix.cxx}}
+
+      - name: build
+        run: cmake --build build/${{matrix.build}} -j4
+
+      - name: run standalone smoke test
+        if: matrix.build == 'standalone'
+        run: ./build/${{matrix.build}}/boss-fqsp -h
+
+      - name: test
+        if: matrix.build == 'test'
+        run: |
+          cd build/${{matrix.build}}
+          ctest --build-config ${{matrix.build_type}}

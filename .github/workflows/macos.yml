@@ -3,13 +3,10 @@ name: MacOS
 on:
   push:
     branches:
-      - master
-      - main
+      - release*
   pull_request:
     branches:
-      - master
-      - main
-
+      - release*
 env:
   CTEST_OUTPUT_ON_FAILURE: 1
   CPM_SOURCE_CACHE: ${{ github.workspace }}/cpm_modules

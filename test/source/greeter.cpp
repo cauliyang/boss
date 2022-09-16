@@ -1,7 +1,7 @@
-#include <boss/fq_utils.h>
 #include <boss/version.h>
 #include <doctest/doctest.h>
 
+#include <boss/fq_utils.hpp>
 #include <string>
 
 TEST_CASE("Greeter") {
