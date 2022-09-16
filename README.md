@@ -5,13 +5,13 @@
 [![License](https://img.shields.io/github/license/ylab-hi/BINARY)](https://github.com/cauliyang/boss/blob/main/LICENSE)
 ![compiler](https://img.shields.io/badge/Compiler-GCC10%20%7C%20GCC11%20%7C%20GCC12-green)
 
-# BioinfOrmaticS toolboxeS aka BOSS
+# **B**ioinf**O**rmatic**S** toolboxe**S** aka **BOSS**
 
 ## Current Tools
 
 | Tool                    | Description                         | Status                                                         |
 |-------------------------|-------------------------------------|----------------------------------------------------------------|
-| [boss-fqsp](#boss-fqsp) | Fastq Splitter for Paried End Reads | ![boss-fqsp](https://img.shields.io/badge/Version-1.0.0-green) |
+| [boss-fqsp](#boss-fqsp) | Fastq Splitter for Paired End Reads | ![boss-fqsp](https://img.shields.io/badge/Version-1.0.0-green) |
 
 ## Usage
 

@@ -46,8 +46,10 @@ auto main(int argc, char** argv) -> int {
       std::exit(1);
     }
 
+    boss::fqsp::split_fq(fs::path(input));
+
   } catch (const cxxopts::OptionException& e) {
-    spdlog::error("{}",  e.what());
+    spdlog::error("{}", e.what());
     std::exit(1);
   }
 

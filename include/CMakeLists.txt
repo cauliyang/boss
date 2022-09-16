@@ -18,9 +18,12 @@ if(PROJECT_SOURCE_DIR STREQUAL PROJECT_BINARY_DIR)
   )
 endif()
 
+option(BOSS_HAS_BOOST "Do not download Boost" OFF)
+
 message(STATUS "Started CMake for  ${PROJECT_NAME} v${PROJECT_VERSION}...")
 message(STATUS "Compiler name: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}")
 message(STATUS "Cmake Binary path: ${CMAKE_BINARY_DIR}")
+message(STATUS "BOSS has boost: ${BOSS_HAS_BOOST}")
 
 # ---- Add dependencies via CPM ----
 # see https://github.com/TheLartians/CPM.cmake for more info
@@ -30,14 +33,8 @@ include(../cmake/CPM.cmake)
 # PackageProject.cmake will be used to make our target installable
 CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.8.0")
 
-CPMAddPackage(
-  NAME spdlog
-  GITHUB_REPOSITORY gabime/spdlog
-  VERSION 1.10.0
-  OPTIONS "SPDLOG_INSTALL YES"
-)
-
 find_package(Boost REQUIRED)
+
 # ---- Add source files ----
 
 # Note: globbing sources is considered bad practice as CMake's generators may not detect new files
@@ -56,7 +53,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 target_compile_options(${PROJECT_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>:/permissive->")
 
 # Link dependencies
-target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog Boost::boost)
+target_link_libraries(${PROJECT_NAME} PUBLIC spdlog::spdlog Boost::boost boost_iostreams)
 
 target_include_directories(
   ${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/../include>

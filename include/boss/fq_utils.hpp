@@ -1,13 +1,22 @@
 #ifndef FQ_UTILS_H
 #define FQ_UTILS_H
 
+#include <spdlog/spdlog.h>
+
 #include <boost/iostreams/categories.hpp>  // input_filter_tag
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/device/file.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/operations.hpp>  // get, put, WOULD_BLOCK
 #include <cstdio>                          // EOF.
 #include <filesystem>
 
-namespace boss {
+namespace boss::fqsp {
+
   namespace fs = std::filesystem;
+  enum class FqDirection;
+  class fq_filter;
 
   enum class FqDirection { Forward, Reverse };
 
@@ -62,10 +71,56 @@ namespace boss {
     int saved_line_count_{0};
   };
 
-  //--------------Definitions of helper functions for splitting ncbi fq files----//
+  namespace details {
 
-  [[nodiscard]] bool is_gzip(std::string_view path);
+    struct txt_tag {};
+    struct gzip_tag : txt_tag {};
+    struct bzip2_tag : txt_tag {};
 
-}  // namespace boss
+    txt_tag format_category(std::string_view path) {
+      if (path.ends_with(".gz")) {
+        return gzip_tag{};
+      } else if (path.ends_with(".bz2")) {
+        return bzip2_tag{};
+      } else {
+        return txt_tag{};
+      }
+    }
+
+    //----------------------------Define helper functions---------------------------//
+    void split_fq_impl(const fs::path& input, FqDirection direction, gzip_tag) {
+      boost::iostreams::filtering_istream in;
+      in.push(fq_filter(direction));
+      in.push(boost::iostreams::gzip_decompressor());
+      in.push(boost::iostreams::file_source(input, std::ios_base::in | std::ios_base::binary));
+
+      std::ofstream out{fmt::format("{}{}{}", input.stem().string(),
+                                    direction == FqDirection::Forward ? "1" : "2",
+                                    input.extension().string())};
+      boost::iostreams::copy(in, out);
+      out.close();
+    }
+
+    void split_fq_impl(const fs::path& input, FqDirection direction, txt_tag) {
+      boost::iostreams::filtering_istream in;
+      in.push(fq_filter(direction));
+      in.push(boost::iostreams::file_source(input, std::ios_base::in));
+      std::ofstream out{fmt::format("{}{}{}", input.stem().string(),
+                                    direction == FqDirection::Forward ? "1" : "2",
+                                    input.extension().string())};
+      boost::iostreams::copy(in, out);
+      out.close();
+    }
+
+  }  // namespace details
+
+  //--------------Definitions of functions for splitting ncbi fq files----//
+
+  void split_fq(const fs::path& input) {
+    details::split_fq_impl(input, FqDirection::Forward, details::format_category(input.string()));
+    details::split_fq_impl(input, FqDirection::Reverse, details::format_category(input.string()));
+  }
+
+}  // namespace boss::fqsp
 
 #endif  // FQ_UTILS_H
