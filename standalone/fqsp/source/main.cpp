@@ -42,11 +42,9 @@ auto main(int argc, char** argv) -> int {
 
   try {
     auto input = result["input"].as<std::string>();
-    if (!binary::utils::check_file_path(input)) {
-      spdlog::error("Input file does not exist: {}", input);
+    if (!boss::fqsp::check_filename(input)) {
       std::exit(1);
     }
-
     boss::fqsp::split_fq(fs::path(input));
 
   } catch (const cxxopts::OptionException& e) {

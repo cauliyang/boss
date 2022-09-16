@@ -1,9 +1,10 @@
+#include <binary/utils.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filtering_streambuf.hpp>
 #include <boss/fq_utils.hpp>
+#include <future>
 #include <iostream>
 
 namespace boss::fqsp {
@@ -14,7 +15,7 @@ namespace boss::fqsp {
     io::filtering_istream in;
     in.push(fq_filter(direction));
     in.push(io::file_source(input.string(), std::ios_base::in));
-    std::ofstream out{fmt::format("{}{}{}", input.stem().string(),
+    std::ofstream out{fmt::format("{}.{}{}", input.stem().string(),
                                   direction == FqDirection::Forward ? "1" : "2",
                                   input.extension().string())};
     io::copy(in, out);
@@ -24,10 +25,9 @@ namespace boss::fqsp {
   void details::split_fq_impl_gz(const fs::path& input, FqDirection direction) {
     spdlog::debug("Processing file: {} {}", input.string(),
                   direction == FqDirection::Forward ? "Forward" : "Reverse");
-    std::ofstream output_file{
-        fmt::format("{}{}{}", input.stem().string(), direction == FqDirection::Forward ? "1" : "2",
-                    input.extension().string()),
-        std::ios_base::out | std::ios_base::binary};
+    std::ofstream output_file{fmt::format("{}.{}{}", input.stem().stem().string(),
+                                          direction == FqDirection::Forward ? "1" : "2", ".fq.gz"),
+                              std::ios_base::out | std::ios_base::binary};
 
     io::filtering_istream in;
     in.push(fqsp::fq_filter(direction));
@@ -44,33 +44,41 @@ namespace boss::fqsp {
 
   bool details::is_gzip(const fs::path& input) { return input.extension() == ".gz"; }
 
+  bool details::check_filename(std::string_view filename) {
+    if (!binary::utils::check_file_path(filename)) {
+      spdlog::error("File {} does not exist", filename);
+      return false;
+    }
+
+    auto path = fs::path(filename);
+
+    if (is_gzip(path)) {
+      if (!(path.stem().extension() == ".fq")) {
+        spdlog::error("File {} is not a valid .fq.gz file", filename);
+        return false;
+      }
+      return true;
+    }
+
+    if (!(path.extension() == ".fq")) {
+      spdlog::error("File {} is not a valid .fq file", filename);
+      return false;
+    }
+
+    return true;
+  }
+
   void split_fq(const fs::path& input) {
+    std::future<void> future;
     if (details::is_gzip(input)) {
-      details::split_fq_impl_gz(input, FqDirection::Forward);
+      future = std::async(details::split_fq_impl_gz, input, FqDirection::Forward);
+      // main thread
       details::split_fq_impl_gz(input, FqDirection::Reverse);
     } else {
-      details::split_fq_impl_txt(input, FqDirection::Forward);
+      future = std::async(details::split_fq_impl_txt, input, FqDirection::Forward);
       details::split_fq_impl_txt(input, FqDirection::Reverse);
     }
+    future.wait();
   }
 
-  void test_gz_write(const fs::path& path) {
-    std::ofstream out{fmt::format("{}{}", path.string(), ".gz")};
-
-    io::filtering_ostream fis;
-    fis.push(io::gzip_compressor());
-    fis.push(out);
-
-    fis << "Hello World!\n";
-    io::close(fis);
-    out.close();
-  }
-
-  void test_gz_read(const fs::path& path) {
-    std::ifstream file(path.string(), std::ios_base::in | std::ios_base::binary);
-    io::filtering_streambuf<io::input> in;
-    in.push(io::gzip_decompressor());
-    in.push(file);
-    boost::iostreams::copy(in, std::cout);
-  }
 }  // namespace boss::fqsp

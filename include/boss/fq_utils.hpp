@@ -42,7 +42,7 @@ namespace boss::fqsp {
     [[nodiscard]] bool is_skip(int c) {
       if (c == '\n') {
         ++line_count_;  // count lines 0-based index
-        if(saved_line_count_ == 0) return true;
+        if (saved_line_count_ == 0) return true;
       }
 
       if (FqDirection::Forward == direction_) {
@@ -70,13 +70,15 @@ namespace boss::fqsp {
 
     void split_fq_impl_txt(const fs::path& input, FqDirection direction);
 
+    [[nodiscard]] bool check_filename(std::string_view filename);
+
   }  // namespace details
 
   //--------------Definitions of functions for splitting ncbi fq files----//
 
   void split_fq(const fs::path& input);
-  void test_gz_read(const fs::path& path);
-  void test_gz_write(const fs::path& path);
+
+  using details::check_filename;
 
 }  // namespace boss::fqsp
 
