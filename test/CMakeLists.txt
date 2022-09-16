@@ -21,7 +21,7 @@ CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 if(TEST_INSTALLED_VERSION)
   find_package(boss REQUIRED)
 else()
-  CPMAddPackage(NAME boss SOURCE_DIR ../library/include)
+  CPMAddPackage(NAME boss SOURCE_DIR ../include)
 endif()
 
 # ---- Create binary ----
@@ -34,7 +34,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20)
 # enable compiler warnings
 if(NOT TEST_INSTALLED_VERSION)
   if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options(boss PUBLIC -Wall -Wpedantic -Wextra -Werror)
+    target_compile_options(boss PUBLIC -Wall -Wpedantic -Wextra)
   elseif(MSVC)
     target_compile_options(boss PUBLIC /W4 /WX)
     target_compile_definitions(${PROJECT_NAME} PUBLIC DOCTEST_CONFIG_USE_STD_HEADERS)
@@ -55,6 +55,6 @@ doctest_discover_tests(${PROJECT_NAME})
 # ---- code coverage ----
 
 if(ENABLE_TEST_COVERAGE)
-  target_compile_options(Greeter PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
-  target_link_options(Greeter PUBLIC -fprofile-arcs -ftest-coverage)
+  target_compile_options(boss PUBLIC -O0 -g -fprofile-arcs -ftest-coverage)
+  target_link_options(boss PUBLIC -fprofile-arcs -ftest-coverage)
 endif()
