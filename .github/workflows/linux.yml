@@ -81,6 +81,9 @@ jobs:
       - name: Install CMake
         run: bash ./.github/workflows/scripts/install_cmake.sh
 
+      - name: Install Boost
+        run: bash ./.github/workflows/scripts/install_boost.sh
+
       - name: Install compiler ${{ matrix.cxx }}
         run: sudo apt-get install --yes ${{ matrix.cxx }} autoconf
 

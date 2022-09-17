@@ -1,7 +1,6 @@
 [![Ubuntu](https://github.com/cauliyang/boss/actions/workflows/linux.yml/badge.svg)](https://github.com/cauliyang/boss/actions/workflows/linux.yml)
 [![Style](https://github.com/cauliyang/boss/actions/workflows/style.yml/badge.svg)](https://github.com/cauliyang/boss/actions/workflows/style.yml)
 [![c++20](https://img.shields.io/badge/C++-c%2B%2B20-green)](https://en.cppreference.com/w/cpp/20)
-[![CodeQL](https://github.com/cauliyang/boss/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/cauliyang/boss/actions/workflows/codeql-analysis.yml)
 [![License](https://img.shields.io/github/license/ylab-hi/BINARY)](https://github.com/cauliyang/boss/blob/main/LICENSE)
 ![compiler](https://img.shields.io/badge/Compiler-GCC10%20%7C%20GCC11%20%7C%20GCC12-green)
 

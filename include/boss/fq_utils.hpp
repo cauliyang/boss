@@ -14,6 +14,9 @@ namespace boss::fqsp {
   enum class FqDirection;
   class fq_filter;
 
+  /**
+   * @brief define the direction of the fastq file
+   */
   enum class FqDirection { Forward, Reverse };
 
   //--------------Definitions of fq input filter for splitting ncbi fq files----//
