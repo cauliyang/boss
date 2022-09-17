@@ -19,6 +19,7 @@
 
 #include <binary/utils.hpp>
 #include <boss/fq_utils.hpp>
+#include <boss/timer.hpp>
 #include <cxxopts.hpp>
 #include <iostream>
 #include <string>
@@ -61,7 +62,10 @@ auto main(int argc, char** argv) -> int {
     if (!boss::fqsp::check_filename(input)) {
       std::exit(1);
     }
+
+    boss::Timer timer{};
     boss::fqsp::split_fq(fs::path(input));
+    spdlog::info("Finished in {:.4f} seconds", timer.elapsed());
 
   } catch (const cxxopts::OptionException& e) {
     spdlog::error("{}", e.what());
