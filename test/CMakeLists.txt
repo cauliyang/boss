@@ -21,7 +21,7 @@ CPMAddPackage("gh:TheLartians/Format.cmake@1.7.3")
 if(TEST_INSTALLED_VERSION)
   find_package(boss REQUIRED)
 else()
-  CPMAddPackage(NAME boss SOURCE_DIR ../include)
+  CPMAddPackage(NAME boss SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include")
 endif()
 
 # ---- Create binary ----
