@@ -53,25 +53,9 @@ namespace boss::fqsp {
     }
 
   private:
-    int get_char(int c) {
-      ++saved_line_count_;
-      return c;
-    }
+    int get_char(int c);
 
-    [[nodiscard]] bool is_skip(int c) {
-      if (c == '\n') {
-        ++line_count_;  // count lines 0-based index
-        if (saved_line_count_ == 0) return true;
-      }
-
-      if (FqDirection::Forward == direction_) {
-        // forward reads : first 4 lines block start
-        return 1 == ((line_count_ >> 2) & 1);
-      } else {
-        // reverse reads : second 4 lines block start
-        return 0 == ((line_count_ >> 2) & 1);
-      }
-    }
+    [[nodiscard]] bool is_skip(int c);
 
     FqDirection direction_;
     // line_count_ starts at 1 b

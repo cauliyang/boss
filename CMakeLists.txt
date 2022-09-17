@@ -19,7 +19,3 @@ if(BOSS_BUILD_TESTS)
   enable_testing()
   add_subdirectory(test ${CMAKE_BINARY_DIR}/test)
 endif()
-
-if(BOSS_BUILD_DOCUMENTS)
-  add_subdirectory(documentation ${CMAKE_BINARY_DIR}/documentation)
-endif()

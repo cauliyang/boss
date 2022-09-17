@@ -35,6 +35,7 @@ namespace boss::fqsp {
                                   direction == FqDirection::Forward ? "1" : "2",
                                   input.extension().string())};
     io::copy(in, out);
+    if (direction == FqDirection::Reverse) out << '\n';
     out.close();
   }
 
@@ -55,6 +56,7 @@ namespace boss::fqsp {
     out.push(output_file);
 
     io::copy(in, out);
+    if (direction == FqDirection::Reverse) out << '\n';
     output_file.close();
   }
 
@@ -97,4 +99,22 @@ namespace boss::fqsp {
     future.wait();
   }
 
+  int fq_filter::get_char(int c) {
+    ++saved_line_count_;
+    return c;
+  }
+  bool fq_filter::is_skip(int c) {
+    if (c == '\n') {
+      ++line_count_;  // count lines 0-based index
+      if (saved_line_count_ == 0) return true;
+    }
+
+    if (FqDirection::Forward == direction_) {
+      // forward reads : first 4 lines block start
+      return 1 == ((line_count_ >> 2) & 1);
+    } else {
+      // reverse reads : second 4 lines block start
+      return 0 == ((line_count_ >> 2) & 1);
+    }
+  }
 }  // namespace boss::fqsp
