@@ -42,7 +42,7 @@ $ boss-fqsp example.fq
 
 * Example 2
 
-The result `example.1.fq.gz` and `example.2.fq` will be written.
+The result `example.1.fq.gz` and `example.2.fq.gz` will be written.
 
 ```console
 $ boss-fqsp example.fq.gz
