@@ -9,20 +9,9 @@
 
 ## Current Tools
 
-| Tool                    | Description                         | Status                                                         |
-|-------------------------|-------------------------------------|----------------------------------------------------------------|
-| [boss-fqsp](#boss-fqsp) | Fastq Splitter for Paired End Reads | ![boss-fqsp](https://img.shields.io/badge/Version-1.0.0-green) | 
-
-
-
-
-## Usage
-
-### boss-fqsp
-
-```console
-boss-fqsp -h
-```
+| Tool                               | Description                         | Status                                                         |
+|------------------------------------|-------------------------------------|----------------------------------------------------------------|
+| [boss-fqsp](document/boss-fqsp.md) | Fastq Splitter for Paired End Reads | ![boss-fqsp](https://img.shields.io/badge/Version-1.0.0-green) | 
 
 ## How to build
 
@@ -135,4 +124,5 @@ Ccache can be enabled by configuring with `-DUSE_CCACHE=<ON | OFF>`.
 - https://github.com/TheLartians/ModernCppStarter
 
 ## License
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fcauliyang%2Fboss.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fcauliyang%2Fboss?ref=badge_large)
