@@ -13,8 +13,6 @@ CAGTGCTCAGCTTGCACCCTGGCACAGGCCAGCAGTTGCTGGAAGTCAGACACCCGGTGCTGGCAATCTCGTTTAAACTA
 CCGGTGTTGAGAATGACTGCGCAAATTTGCCGGATTTCCTTTGCTGTTCCTGCATGTAGTTTAAACGAGATTGCCAGCACCGGGTGTCTGACTTCCAGCAA
 +SRR8618317.1.2 1 length=101
 ?????????????????????????????????????????????????????????????????????????????????????????????????????
-@SRR8618317.2.1 2 length=101
-GTTGAGAATGACTGCGCAAATTTGCCGGATTTCCTTTGCTGTTCCTGCATGTAGTTTAAACGAGATTGCCAGCACCGGGTATCATTCACCATTTTTCTTTT
 ```
 
 Every four lines are belong to one end of paired reads.
@@ -50,16 +48,12 @@ $ boss-fqsp example.fq.gz
 
 ## Performance
 
-**NOTE**: The performance is tested simply by `time` command. It is not a benchmark.
+The performance is tested simply by `time` command. It is not a benchmark.
+The slowest part is the gzip decompression and compression.
 
-| File Size | Format | Time |
-|-----------|--------|------|
-| 1.2G      | fq.gz  | 0.2s |
-| 1.2G      | fq     | 0.2s |
+| File Size | Line Number | Format | Time  |
+|:----------|-------------|--------|-------|
+| 2.2G      | 420'010'288 | fq.gz  | 18m   |
+| 28G       | 420'010'288 | fq     | 4m14s |
 
 ## Current Issues
-
-
-
-
-
