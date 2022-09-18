@@ -31,33 +31,29 @@ namespace boss::fqsp {
     io::filtering_istream in;
     in.push(fq_filter(direction));
     in.push(io::file_source(input.string(), std::ios_base::in));
-    std::ofstream out{fmt::format("{}.{}{}", input.stem().string(),
-                                  direction == FqDirection::Forward ? "1" : "2",
-                                  input.extension().string())};
+
+    io::filtering_ostream out;
+    out.push(io::file_sink(fmt::format("{}.{}{}", input.stem().string(),
+                                       direction == FqDirection::Forward ? "1" : "2",
+                                       input.extension().string())));
+
     io::copy(in, out);
-    if (direction == FqDirection::Reverse) out << '\n';
-    out.close();
   }
 
   void details::split_fq_impl_gz(const fs::path& input, FqDirection direction) {
     spdlog::debug("Processing file: {} {}", input.string(),
                   direction == FqDirection::Forward ? "Forward" : "Reverse");
-    std::ofstream output_file{fmt::format("{}.{}{}", input.stem().stem().string(),
-                                          direction == FqDirection::Forward ? "1" : "2", ".fq.gz"),
-                              std::ios_base::out | std::ios_base::binary};
 
     io::filtering_istream in;
     in.push(fqsp::fq_filter(direction));
     in.push(io::gzip_decompressor());
-    in.push(io::file_source(input.string(), std::ios_base::in | std::ios_base::binary));
+    in.push(io::file_source(input.string()));
 
     io::filtering_ostream out;
     out.push(io::gzip_compressor());
-    out.push(output_file);
-
+    out.push(io::file_sink(fmt::format("{}.{}{}", input.stem().stem().string(),
+                                       direction == FqDirection::Forward ? "1" : "2", ".fq.gz")));
     io::copy(in, out);
-    if (direction == FqDirection::Reverse) out << '\n';
-    output_file.close();
   }
 
   bool details::is_gzip(const fs::path& input) { return input.extension() == ".gz"; }
@@ -86,6 +82,17 @@ namespace boss::fqsp {
     return true;
   }
 
+  [[maybe_unused]] void details::print_char(const fs::path& path) {
+    io::filtering_istream in;
+    in.push(io::gzip_decompressor());
+    in.push(io::file_source(path.string(), std::ios_base::in));
+
+    char c;
+    while (in.get(c)) {
+      std::cout << (int)c << " ";
+    }
+  }
+
   void split_fq(const fs::path& input) {
     std::future<void> future;
     if (details::is_gzip(input)) {
@@ -100,21 +107,46 @@ namespace boss::fqsp {
   }
 
   int fq_filter::get_char(int c) {
-    ++saved_line_count_;
-    return c;
-  }
-  bool fq_filter::is_skip(int c) {
+    has_return_ = true;
+    spdlog::debug("Return char: {} Saved Line: {} Line Count: {}", static_cast<char>(c),
+                  saved_line_count_, line_count_);
     if (c == '\n') {
-      ++line_count_;  // count lines 0-based index
-      if (saved_line_count_ == 0) return true;
+      has_end_ = true;
+      if (saved_line_count_ == 3) {
+        saved_line_count_ = 0;
+      } else {
+        ++saved_line_count_;
+      }
+    } else {
+      has_end_ = false;
     }
 
+    return c;
+  }
+
+  bool fq_filter::is_return(int c) {
+    if (c == '\n') {
+      ++line_count_;  // count lines 0-based index
+
+      if (saved_line_count_ == 3) {
+        return true;
+      } else if (!has_return_) {
+        return false;
+      } else if (has_end_) {
+        return false;
+      }
+    }
+
+    return is_return_impl();
+  }
+
+  bool fq_filter::is_return_impl() const {
     if (FqDirection::Forward == direction_) {
       // forward reads : first 4 lines block start
-      return 1 == ((line_count_ >> 2) & 1);
+      return 0 == ((line_count_ >> 2) & 1);
     } else {
       // reverse reads : second 4 lines block start
-      return 0 == ((line_count_ >> 2) & 1);
+      return 1 == ((line_count_ >> 2) & 1);
     }
   }
 }  // namespace boss::fqsp

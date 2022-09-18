@@ -46,8 +46,8 @@ namespace boss::fqsp {
     template <typename Source> int get(Source& src) {
       int c;
       while ((c = boost::iostreams::get(src)) != EOF && c != boost::iostreams::WOULD_BLOCK
-             && is_skip(c))
-        ;
+             && !is_return(c))
+        spdlog::debug("Skip char: {}", c);
 
       return get_char(c);
     }
@@ -55,13 +55,17 @@ namespace boss::fqsp {
   private:
     int get_char(int c);
 
-    [[nodiscard]] bool is_skip(int c);
+    [[nodiscard]] bool is_return(int c);
+
+    [[nodiscard]] bool is_return_impl() const;
 
     FqDirection direction_;
     // line_count_ starts at 1 b
     // Max line_count_ is  2^64 - 1 = 18,446,744,073,709,551,615
     uint64_t line_count_{0};
     uint64_t saved_line_count_{0};
+    bool has_return_{false};
+    bool has_end_{false};
   };
 
   namespace details {
@@ -74,6 +78,8 @@ namespace boss::fqsp {
     void split_fq_impl_txt(const fs::path& input, FqDirection direction);
 
     [[nodiscard]] bool check_filename(std::string_view filename);
+
+    [[maybe_unused]] void print_char(const fs::path& path);
 
   }  // namespace details
 
