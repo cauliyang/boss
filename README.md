@@ -15,7 +15,7 @@
 
 ## Usage
 
-* [Get Started](documents/get-start.md)
+* [Get Started](document/get-start.md)
 
 ## Acknowledgements
 
