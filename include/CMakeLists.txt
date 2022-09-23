@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...3.22)
+cmake_minimum_required(VERSION 3.14...3.23)
 
 # ---- Project ----
 
@@ -39,7 +39,14 @@ CPMAddPackage(
   OPTIONS "BINARY_BUILD_STANDALONE NO" "BINARY_BUILD_TESTS NO"
 )
 
-find_package(Boost REQUIRED COMPONENTS system iostreams)
+# squeue requires this package
+CPMAddPackage(
+  GITHUB_REPOSITORY p-ranav/tabulate
+  VERSION 1.4
+  OPTIONS "USE_CPP17 ON"
+)
+
+find_package(Boost REQUIRED COMPONENTS system iostreams filesystem)
 
 # ---- Add source files ----
 
@@ -61,7 +68,14 @@ target_compile_options(${PROJECT_NAME} PUBLIC "$<$<COMPILE_LANG_AND_ID:CXX,MSVC>
 
 # Link dependencies
 target_link_libraries(
-  ${PROJECT_NAME} PUBLIC spdlog::spdlog Boost::boost Boost::iostreams binary::binary
+  ${PROJECT_NAME}
+  PUBLIC spdlog::spdlog
+         Boost::boost
+         Boost::iostreams
+         Boost::system
+         Boost::filesystem
+         tabulate::tabulate
+         binary::binary
 )
 
 target_include_directories(

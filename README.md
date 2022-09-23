@@ -24,6 +24,7 @@
 - https://github.com/jarro2783/cxxopts
 - https://github.com/gabime/spdlog
 - https://github.com/TheLartians/ModernCppStarter
+- https://github.com/p-ranav/tabulate
 
 ## License
 

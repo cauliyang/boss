@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...3.22)
+cmake_minimum_required(VERSION 3.14...3.23)
 
 project(BOSS_Standalone LANGUAGES CXX)
 
@@ -39,3 +39,4 @@ endfunction()
 # file(GLOB sources CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp)
 
 add_standalone(fqsp)
+add_standalone(squeue)
