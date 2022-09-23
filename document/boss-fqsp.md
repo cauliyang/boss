@@ -1,5 +1,13 @@
 # Document for FQSP
 
+## Table of Contents
+
+- [1. Aim](#aim)
+- [2. Usage](#usage)
+- [3. Performance](#performance)
+- [4. Current Issues](#current-issues)
+
+
 ## Aim
 
 `boss-fqsp` is used to split one fastq file into two fastq files. The format of the input fastq file is as follows:
