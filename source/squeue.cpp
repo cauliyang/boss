@@ -17,29 +17,97 @@
 //
 // Created by li002252 on 9/22/22.
 //
+#include <spdlog/fmt/ostr.h>
+#include <spdlog/spdlog.h>
+
+#include <boost/algorithm/string.hpp>
 #include <boss/squeue.hpp>
+#include <boss/utils.hpp>
+#include <tabulate/table.hpp>
 
 namespace boss::squeue {
 
-  std::vector<std::string> get_cmd_output(boost::filesystem::path const& cmd) {
-    bp::ipstream is;  // reading pipe-stream
-    bp::child c(cmd, bp::std_out > is);
+  namespace ba = boost::algorithm;
 
-    std::vector<std::string> data;
-    std::string line;
-
-    while (c.running() && std::getline(is, line) && !line.empty()) data.push_back(line);
-
-    c.wait();
-
-    return data;
+  std::ostream& operator<<(std::ostream& os, Status s) {
+    switch (s) {
+      case Status::R:
+        os << "running";
+        break;
+      case Status::PD:
+        os << "pending";
+        break;
+      case Status::CG:
+        os << "completing";
+        break;
+      case Status::ST:
+        os << "stopped";
+        break;
+    }
+    return os;
   }
 
-  bool check_cmd(std::string_view cmd) {
-    auto cmd_path = bp::search_path(cmd.data());
-    return !cmd_path.empty();
+  Status to_status(std::string_view status) {
+    static std::map<std::string_view, Status> const status_map = {
+        {"R", Status::R},
+        {"PD", Status::PD},
+        {"CG", Status::CG},
+        {"ST", Status::ST},
+    };
+    spdlog::debug("status: {}", status);
+    return status_map.at(status);
   }
 
-  // 1541748  short 298ALMFi  zlc6394  R    3:41:03      1 qnode0389
+  Queue::Queue(std::string_view name) : name_{name} {}
+
+  void Queue::update(Status status) { status_count_[status]++; }
+
+  void Queues::update(std::string_view queue_name, Status status) {
+    spdlog::debug("queue_name: {}, status: {}", queue_name, status);
+    auto [iter, success] = queues_.try_emplace(queue_name.data(), queue_name);
+    iter->second.update(status);
+  }
+
+  // 1541748  short 298ALMFi  zlc6394  R    3:41:03      1 qnode 0389
+  void Queues::summary(const std::vector<std::string>& data) {
+    for (auto line : data) {
+      ba::trim_if(line, ba::is_any_of(" "));
+      auto tokens = parse_line(line);
+      std::size_t status_index = tokens.size() == 9 ? 5 : 4;
+
+      update(tokens.at(1), to_status(tokens.at(status_index)));
+    }
+  }
+
+  std::vector<std::string> Queues::parse_line(std::string_view line) const {
+    // split line  by space
+
+    std::vector<std::string> tokens{};
+    ba::split(tokens, line, ba::is_space(), ba::token_compress_on);
+    return tokens;
+  }
+
+  void Queues::print_table() const {
+    using namespace tabulate;
+    Table table;
+    table.format().font_style({FontStyle::bold});
+    table.add_row({"Queue", "Running", "Pending", "Stopped"});
+
+    for (auto& [name, queue] : queues_) {
+      table.add_row({name, std::to_string(queue.running()), std::to_string(queue.pending()),
+                     std::to_string(queue.stopped())});
+    }
+
+    for (size_t i = 0; i < 4; ++i) {
+      table[0][i].format().font_color(Color::yellow).font_style({FontStyle::bold});
+    }
+
+    table.column(0).format().font_align(FontAlign::left);
+    table.column(1).format().font_align(FontAlign::right);
+    table.column(2).format().font_align(FontAlign::right);
+    table.column(3).format().font_align(FontAlign::right);
+
+    std::cout << table << "\n";
+  }
 
 }  // namespace boss::squeue

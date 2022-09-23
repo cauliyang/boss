@@ -20,19 +20,56 @@
 
 #ifndef BOSS_ALL_SQUEUE_HPP
 #define BOSS_ALL_SQUEUE_HPP
-#include <boost/process.hpp>
+#include <map>
 #include <string>
 #include <vector>
 
 namespace boss::squeue {
 
-  namespace bp = boost::process;
+  enum class Status {
+    R,   // running
+    PD,  // pending
+    CG,  // completing
+    ST,  // stopped
+  };
 
-  [[nodiscard]] bool check_cmd(std::string_view cmd);
+  std::ostream& operator<<(std::ostream& os, Status s);
 
-  std::vector<std::string> get_cmd_output(boost::filesystem::path const& cmd);
+  Status to_status(std::string_view status);
 
-  void summary(std::vector<std::string> const& data);
+  class Queue {
+  public:
+    explicit Queue(std::string_view name);
+    void update(Status status);
+
+    [[nodiscard]] auto running() const -> int { return status_count_.at(Status::R); }
+    [[nodiscard]] auto pending() const -> int { return status_count_.at(Status::PD); }
+    [[nodiscard]] auto completing() const -> int { return status_count_.at(Status::CG); }
+    [[nodiscard]] auto stopped() const -> int { return status_count_.at(Status::ST); }
+
+  private:
+    friend class Queues;
+    std::string name_{};
+    std::map<Status, int> status_count_{
+        {Status::R, 0},
+        {Status::PD, 0},
+        {Status::CG, 0},
+        {Status::ST, 0},
+    };
+  };
+
+  class Queues {
+  public:
+    Queues() = default;
+    void summary(const std::vector<std::string>& data);
+    void print_table() const;
+
+  private:
+    void update(std::string_view queue_name, Status status);
+    [[nodiscard]] std::vector<std::string> parse_line(std::string_view line) const;
+
+    std::map<std::string, Queue> queues_{};
+  };
 
 }  // namespace boss::squeue
 

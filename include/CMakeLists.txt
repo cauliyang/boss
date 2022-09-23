@@ -35,7 +35,7 @@ CPMAddPackage("gh:TheLartians/PackageProject.cmake@1.8.0")
 
 CPMAddPackage(
   GITHUB_REPOSITORY ylab-hi/BINARY
-  VERSION 1.1.0
+  VERSION 1.1.2
   OPTIONS "BINARY_BUILD_STANDALONE NO" "BINARY_BUILD_TESTS NO"
 )
 

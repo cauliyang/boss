@@ -19,6 +19,7 @@
 
 #include <boss/squeue.hpp>
 #include <boss/timer.hpp>
+#include <boss/utils.hpp>
 #include <cxxopts.hpp>
 
 auto main(int argc, char** argv) -> int {
@@ -50,27 +51,25 @@ auto main(int argc, char** argv) -> int {
   }
 
   try {
-    constexpr auto squeue_cmd = "squeue";
-    constexpr auto squeue_me_cmd = "squeue --me";
+    constexpr std::string_view squeue_cmd = "squeue";
+    constexpr std::string_view squeue_me_cmd = "squeue --me";
+    spdlog::debug("Checking if {} is available", squeue_cmd);
+    spdlog::debug("Checking if {} is available", squeue_me_cmd);
 
-    if (!boost::squeue::check_cmd(squeue_cmd)) {
+    if (!boss::utils::check_cmd(squeue_cmd)) {
       spdlog::error("squeue command not found");
       std::exit(1);
     }
 
-    boss::Timer timer{};
-
     if (auto me = result["me"].as<bool>(); me)
       spdlog::info("Checking your jobs' status");
     else {
-      auto output = boss::squeue::get_cmd_output("zls");
-
-      for (auto& line : output) {
-        spdlog::info(line);
-      }
+      boss::squeue::Queues queues{};
+      auto output = boss::utils::get_cmd_output(squeue_cmd);
+      output.erase(output.begin());  // remove the header line
+      queues.summary(output);
+      queues.print_table();
     }
-
-    spdlog::info("Finished in {:.4f} seconds", timer.elapsed());
 
   } catch (const cxxopts::OptionException& e) {
     spdlog::error("{}", e.what());
