@@ -7,7 +7,6 @@
 - [3. Performance](#performance)
 - [4. Current Issues](#current-issues)
 
-
 ## Aim
 
 `boss-fqsp` is used to split one fastq file into two fastq files. The format of the input fastq file is as follows:
@@ -27,7 +26,10 @@ Every four lines are belong to one end of paired reads.
 
 ## Usage
 
+`boss-fqsp -h` will show the help message.
+
 ```console
+$ boss-fqsp -h
 fqsp - A program to split ncbi fq files into forward and reverse files.
 Usage:
   boss-fqsp [OPTION...] [input.fq|.fq.gz]
@@ -59,9 +61,9 @@ $ boss-fqsp example.fq.gz
 The performance is tested simply by `time` command. It is not a benchmark.
 The slowest part is the gzip decompression and compression.
 
-| File Size | Line Number | Format | Time  |
+| File Size | Line Number | Format |   Time |
 |:----------|-------------|--------|-------|
-| 2.2G      | 420'010'288 | fq.gz  | 18m   |
-| 28G       | 420'010'288 | fq     | 4m14s |
+| 2.2G      | 420'010'288 | fq.gz  |    18m |
+| 28G       | 420'010'288 | fq     |  4m14s |
 
 ## Current Issues
