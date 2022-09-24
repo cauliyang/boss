@@ -42,7 +42,7 @@ CPMAddPackage(
 # squeue requires this package
 CPMAddPackage(
   GITHUB_REPOSITORY p-ranav/tabulate
-  GIT_TAG v1.4
+  GIT_TAG 6e74231ae8608fe4ebd65b87922ad175f4ec9c1c
   OPTIONS "USE_CPP17 ON"
 )
 
