@@ -1,5 +1,12 @@
 # Document for SQUEUE
 
+## Table of Contents
+
+- [1. Aim](#aim)
+- [2. Usage](#usage)
+- [3. Performance](#performance)
+- [4. Current Issues](#current-issues)
+
 ## Aim
 
 `boss-squeue` is used to get the status of jobs in the HPC. It is a wrapper of `squeue` command. Hence, it is necessary
@@ -21,11 +28,11 @@ Usage:
   -d, --debug    Enable debug mode
 ```
 
-* Example 1
+- Example 1
 
 ![img.png](imgs/boss-squeue-ex1.png)
 
-* Example 2
+- Example 2
 
 ![img.png](imgs/boss-squeue-ex2.png)
 
@@ -33,9 +40,9 @@ Usage:
 
 The performance is tested simply by `time` command. It is not a benchmark.
 
-| Command             | Time |
-|:--------------------|-----:|
-| `boss-squeue`       | 0.7s |
-| `boss-squeue --me`  | 0.5s |
+| Command            | Time |
+| :----------------- | ---: |
+| `boss-squeue`      | 0.7s |
+| `boss-squeue --me` | 0.5s |
 
 ## Current Issues

@@ -10,13 +10,13 @@
 ## Current Tools
 
 | Tool                                   | Description                          | Status                                                           |
-|----------------------------------------|--------------------------------------|------------------------------------------------------------------|
-| [boss-fqsp](document/boss-fqsp.md)     | Fastq Splitter for Paired End Reads  | ![boss-fqsp](https://img.shields.io/badge/Version-1.0.3-green)   | 
-| [boss-squeue](document/boss-squeue.md) | Summary Status of Jobs in HPC Queues | ![boss-squeue](https://img.shields.io/badge/Version-1.0.3-green) | 
+| -------------------------------------- | ------------------------------------ | ---------------------------------------------------------------- |
+| [boss-fqsp](document/boss-fqsp.md)     | Fastq Splitter for Paired End Reads  | ![boss-fqsp](https://img.shields.io/badge/Version-1.0.3-green)   |
+| [boss-squeue](document/boss-squeue.md) | Summary Status of Jobs in HPC Queues | ![boss-squeue](https://img.shields.io/badge/Version-1.0.3-green) |
 
 ## Usage
 
-* [Get Started](document/get-start.md)
+- [Get Started](document/get-start.md)
 
 ## Acknowledgements
 

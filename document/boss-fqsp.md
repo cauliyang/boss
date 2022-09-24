@@ -40,15 +40,15 @@ Usage:
   -d, --debug       Enable debug mode
 ```
 
-* Example 1
+- Example 1
 
-The result `example.1.fq`  and `example.2.fq` will be written.
+The result `example.1.fq` and `example.2.fq` will be written.
 
 ```console
 $ boss-fqsp example.fq
 ```
 
-* Example 2
+- Example 2
 
 The result `example.1.fq.gz` and `example.2.fq.gz` will be written.
 
@@ -61,9 +61,9 @@ $ boss-fqsp example.fq.gz
 The performance is tested simply by `time` command. It is not a benchmark.
 The slowest part is the gzip decompression and compression.
 
-| File Size | Line Number | Format |   Time |
-|:----------|-------------|--------|-------|
-| 2.2G      | 420'010'288 | fq.gz  |    18m |
-| 28G       | 420'010'288 | fq     |  4m14s |
+| File Size | Line Number | Format | Time  |
+| :-------- | ----------- | ------ | ----- |
+| 2.2G      | 420'010'288 | fq.gz  | 18m   |
+| 28G       | 420'010'288 | fq     | 4m14s |
 
 ## Current Issues
