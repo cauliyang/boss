@@ -20,6 +20,8 @@
 
 #ifndef BOSS_ALL_UTILS_HPP
 #define BOSS_ALL_UTILS_HPP
+#include <spdlog/spdlog.h>
+
 #include <boost/algorithm/string.hpp>
 #include <boost/process.hpp>
 #include <cctype>
@@ -29,9 +31,40 @@
 
 namespace boss::utils {
 
-  [[nodiscard]] bool check_cmd(std::string_view cmd);
-  std::vector<std::string> get_cmd_output(boost::filesystem::path const& cmd);
-  std::vector<std::string> get_cmd_output(std::string_view cmd);
+  using namespace std::string_literals;
+
+  std::string operator+(std::string_view lhs, std::string_view rhs);
+  std::string operator+(std::string_view lhs, std::string rhs);
+  std::string operator+(std::string lhs, std::string_view rhs);
+
+  template <typename... Args>
+  std::vector<std::string> cmd_output(std::string_view cmd, Args&&... args) {
+    auto res = std::vector<std::string>();
+
+    auto cmd_path = boost::process::search_path(cmd.data());
+
+    if (cmd_path.empty()) {
+      spdlog::error("Command {} not found", cmd);
+      return res;
+    }
+
+    std::string cmd_args = (" "s + ... + args);
+
+    auto final_cmd = cmd_path.string() + cmd_args;
+
+    spdlog::debug("cmd: {}", final_cmd);
+
+    boost::process::ipstream is;  // reading pipe-stream
+    boost::process::child c(final_cmd, boost::process::std_out > is);
+
+    std::string line;
+
+    while (c.running() && std::getline(is, line) && !line.empty()) res.push_back(line);
+
+    c.wait();
+
+    return res;
+  }
 
   template <std::ranges::input_range Range> void printr(Range const& range) {
     int index = 0;
