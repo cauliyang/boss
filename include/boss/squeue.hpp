@@ -64,7 +64,7 @@ namespace boss::squeue {
 
   class Queues {
   public:
-    Queues() = default;
+    constexpr Queues() = default;
     void summary(const std::vector<std::string>& data);
     void print_table() const;
 
