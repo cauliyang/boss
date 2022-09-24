@@ -52,24 +52,21 @@ auto main(int argc, char** argv) -> int {
 
   try {
     constexpr std::string_view squeue_cmd = "squeue";
-    constexpr std::string_view squeue_me_cmd = "squeue --me";
-    spdlog::debug("Checking if {} is available", squeue_cmd);
-    spdlog::debug("Checking if {} is available", squeue_me_cmd);
 
-    if (!boss::utils::check_cmd(squeue_cmd)) {
-      spdlog::error("squeue command not found");
-      std::exit(1);
+    std::string_view args = "";
+    if (auto me = result["me"].as<bool>(); me) args = "--me";
+
+    boss::squeue::Queues queues{};
+    auto output = boss::utils::cmd_output(squeue_cmd, args);
+    if (output.empty() || output.size() == 1) {
+      spdlog::info("No jobs in the queue.");
+      return 0;
     }
 
-    if (auto me = result["me"].as<bool>(); me)
-      spdlog::info("Checking your jobs' status");
-    else {
-      boss::squeue::Queues queues{};
-      auto output = boss::utils::get_cmd_output(squeue_cmd);
-      output.erase(output.begin());  // remove the header line
-      queues.summary(output);
-      queues.print_table();
-    }
+    // Remove the header line
+    output.erase(output.begin());
+    queues.summary(output);
+    queues.print_table();
 
   } catch (const cxxopts::OptionException& e) {
     spdlog::error("{}", e.what());

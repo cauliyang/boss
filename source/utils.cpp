@@ -17,28 +17,9 @@
 #include <boss/utils.hpp>
 
 namespace boss::utils {
-
-  std::vector<std::string> get_cmd_output(std::string_view cmd) {
-    return get_cmd_output(boost::process::search_path(cmd.data()));
+  std::string operator+(std::string_view lhs, std::string_view rhs) {
+    return std::string(lhs) + std::string(rhs);
   }
-
-  std::vector<std::string> get_cmd_output(boost::filesystem::path const& cmd) {
-    boost::process::ipstream is;  // reading pipe-stream
-    boost::process::child c(cmd, boost::process::std_out > is);
-
-    std::vector<std::string> data;
-    std::string line;
-
-    while (c.running() && std::getline(is, line) && !line.empty()) data.push_back(line);
-
-    c.wait();
-
-    return data;
-  }
-
-  bool check_cmd(std::string_view cmd) {
-    auto cmd_path = boost::process::search_path(cmd.data());
-    return !cmd_path.empty();
-  }
-
+  std::string operator+(std::string_view lhs, std::string rhs) { return lhs.data() + rhs; }
+  std::string operator+(std::string lhs, std::string_view rhs) { return lhs + rhs.data(); }
 }  // namespace boss::utils

@@ -20,10 +20,12 @@
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
 
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <boss/squeue.hpp>
 #include <boss/utils.hpp>
 #include <tabulate/table.hpp>
+#include <variant>
 
 namespace boss::squeue {
 
@@ -43,6 +45,9 @@ namespace boss::squeue {
       case Status::ST:
         os << "stopped";
         break;
+      default:
+        os << "unknown";
+        break;
     }
     return os;
   }
@@ -54,7 +59,7 @@ namespace boss::squeue {
         {"CG", Status::CG},
         {"ST", Status::ST},
     };
-    spdlog::debug("status: {}", status);
+    spdlog::debug("[to status] status: {}", status);
     return status_map.at(status);
   }
 
@@ -63,7 +68,7 @@ namespace boss::squeue {
   void Queue::update(Status status) { status_count_[status]++; }
 
   void Queues::update(std::string_view queue_name, Status status) {
-    spdlog::debug("queue_name: {}, status: {}", queue_name, status);
+    spdlog::debug("[update]: queue_name: {}, status: {}", queue_name, status);
     auto [iter, success] = queues_.try_emplace(queue_name.data(), queue_name);
     iter->second.update(status);
   }
@@ -73,13 +78,12 @@ namespace boss::squeue {
     for (auto line : data) {
       ba::trim_if(line, ba::is_any_of(" "));
       auto tokens = parse_line(line);
-      std::size_t status_index = tokens.size() == 9 ? 5 : 4;
-
+      auto status_index = get_status_index(tokens);
       update(tokens.at(1), to_status(tokens.at(status_index)));
     }
   }
 
-  std::vector<std::string> Queues::parse_line(std::string_view line) const {
+  std::vector<std::string> Queues::parse_line(std::string_view line) {
     // split line  by space
 
     std::vector<std::string> tokens{};
@@ -89,17 +93,17 @@ namespace boss::squeue {
 
   void Queues::print_table() const {
     using namespace tabulate;
+
     Table table;
-    table.format().font_style({FontStyle::bold});
+    table.format().font_style({FontStyle::bold}).border_color(Color::green);
+
+    // header
     table.add_row({"Queue", "Running", "Pending", "Stopped"});
+    table[0].format().font_color(Color::green).font_style({FontStyle::bold});
 
     for (auto& [name, queue] : queues_) {
       table.add_row({name, std::to_string(queue.running()), std::to_string(queue.pending()),
                      std::to_string(queue.stopped())});
-    }
-
-    for (size_t i = 0; i < 4; ++i) {
-      table[0][i].format().font_color(Color::yellow).font_style({FontStyle::bold});
     }
 
     table.column(0).format().font_align(FontAlign::left);
@@ -107,7 +111,24 @@ namespace boss::squeue {
     table.column(2).format().font_align(FontAlign::right);
     table.column(3).format().font_align(FontAlign::right);
 
+    for (std::size_t index = 1; index < size() + 1; ++index) {
+      table[index][0].format().font_color(Color::cyan);
+    }
+
     std::cout << table << "\n";
   }
+
+  std::size_t Queues::get_status_index(const std::vector<std::string>& tokens,
+                                       std::size_t index) const {
+    auto const& status = tokens[index];
+
+    if (std::ranges::find(STATUS_NAMES, status) == std::end(STATUS_NAMES)) {
+      return get_status_index(tokens, ++index);
+    }
+
+    return index;
+  }
+
+  std::size_t Queues::size() const { return queues_.size(); }
 
 }  // namespace boss::squeue

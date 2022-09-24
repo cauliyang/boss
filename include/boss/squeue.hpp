@@ -26,6 +26,8 @@
 
 namespace boss::squeue {
 
+  constexpr std::array<std::string_view, 4> STATUS_NAMES{"R", "PD", "CG", "ST"};
+
   enum class Status {
     R,   // running
     PD,  // pending
@@ -39,16 +41,18 @@ namespace boss::squeue {
 
   class Queue {
   public:
+    friend class Queues;
     explicit Queue(std::string_view name);
     void update(Status status);
 
     [[nodiscard]] auto running() const -> int { return status_count_.at(Status::R); }
     [[nodiscard]] auto pending() const -> int { return status_count_.at(Status::PD); }
-    [[nodiscard]] auto completing() const -> int { return status_count_.at(Status::CG); }
+    [[maybe_unused]] [[nodiscard]] auto completing() const -> int {
+      return status_count_.at(Status::CG);
+    }
     [[nodiscard]] auto stopped() const -> int { return status_count_.at(Status::ST); }
 
   private:
-    friend class Queues;
     std::string name_{};
     std::map<Status, int> status_count_{
         {Status::R, 0},
@@ -64,11 +68,15 @@ namespace boss::squeue {
     void summary(const std::vector<std::string>& data);
     void print_table() const;
 
-  private:
-    void update(std::string_view queue_name, Status status);
-    [[nodiscard]] std::vector<std::string> parse_line(std::string_view line) const;
+    [[nodiscard]] std::size_t size() const;
 
-    std::map<std::string, Queue> queues_{};
+  private:
+    [[nodiscard]] std::size_t get_status_index(std::vector<std::string> const&,
+                                               std::size_t index = 4) const;
+    void update(std::string_view queue_name, Status status);
+    [[nodiscard]] static std::vector<std::string> parse_line(std::string_view line);
+
+    std::map<std::string, Queue, std::less<>> queues_{};
   };
 
 }  // namespace boss::squeue
