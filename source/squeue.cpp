@@ -95,7 +95,10 @@ namespace boss::squeue {
     using namespace tabulate;
 
     Table table;
-    table.format().font_style({FontStyle::bold}).border_color(Color::green);
+    table.format()
+        .font_style({FontStyle::bold})
+        .border_color(Color::green)
+        .corner_color(Color::green);
 
     // header
     table.add_row({"Queue", "Running", "Pending", "Stopped"});
